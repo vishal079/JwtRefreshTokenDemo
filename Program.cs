@@ -1,3 +1,4 @@
+using JwtRefreshTokenDemo.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -63,6 +64,7 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
+builder.Services.AddScoped<GetDataService>();
 
 builder.Services.AddAuthorization();
 

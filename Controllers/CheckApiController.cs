@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using JwtRefreshTokenDemo.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace JwtRefreshTokenDemo.Controllers
@@ -7,7 +8,12 @@ namespace JwtRefreshTokenDemo.Controllers
     [Route("api/check")]
     public class CheckApiController : ControllerBase
     {
-        [Authorize]
+        public readonly GetDataService _getDataService;
+        public CheckApiController(GetDataService getDataService)
+        {
+            _getDataService = getDataService;
+        }   
+        //[Authorize]
         [HttpGet("secure")]
         public IActionResult SecureApi()
         {
@@ -16,6 +22,21 @@ namespace JwtRefreshTokenDemo.Controllers
                 message = "Access granted",
                 user = User.Identity?.Name
             });
+        }
+        [HttpGet("long-process")]
+        public async Task<IActionResult> LongProcess()
+        {
+            try
+            {
+                var result = await _getDataService.ProcessAsync(HttpContext.RequestAborted);
+                return Ok(result);
+            }
+            catch (OperationCanceledException)
+            {
+                // Log cancellation (optional)
+                Console.WriteLine("Request cancelled by client");
+                return StatusCode(499, "Request cancelled"); // Client Closed Request
+            }
         }
     }
 }
